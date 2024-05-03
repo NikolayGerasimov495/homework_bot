@@ -40,7 +40,8 @@ HOMEWORK_VERDICTS = {
 
 
 def check_tokens():
-    """Проверяет доступность переменных окружения,необходимых для работы бота."""
+    """Проверяет доступность переменных окружения.
+    необходимых для работы бота."""
     if not all([PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID]):
         logger.critical('Проблема с переменными окружения')
         exit()
@@ -76,7 +77,7 @@ def get_api_answer(timestamp):
 
 
 def check_response(response):
-    """Проверяет ответ API на соответствие документации из
+    """Проверяет ответ API на соответствие документации из.
     урока «API сервиса Практикум Домашка».
     """
     if not isinstance(response, dict):
