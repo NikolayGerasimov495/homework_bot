@@ -40,10 +40,8 @@ HOMEWORK_VERDICTS = {
 
 
 def check_tokens():
-    """
-    Проверяет доступность переменных окружения,
-    необходимых для работы бота.
-    """
+    """Проверяет доступность переменных окружения,
+    необходимых для работы бота."""
     if not all([PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID]):
         logger.critical('Проблема с переменными окружения')
         exit()
@@ -60,9 +58,7 @@ def send_message(bot, message):
 
 
 def get_api_answer(timestamp):
-    """
-        Делает запрос к единственному эндпоинту API-сервиса.
-    """
+    """Делает запрос к единственному эндпоинту API-сервиса."""
     params = {'from_date': timestamp}
     logger.info(f'Отправлен запрос API {ENDPOINT}')
     try:
@@ -81,10 +77,8 @@ def get_api_answer(timestamp):
 
 
 def check_response(response):
-    """
-    Проверяет ответ API на соответствие документации из
-    урока «API сервиса Практикум Домашка».
-    """
+    """Проверяет ответ API на соответствие документации из
+    урока «API сервиса Практикум Домашка»."""
     if not isinstance(response, dict):
         raise TypeError('Ответ API должен быть словарем')
 
@@ -108,13 +102,11 @@ def check_response(response):
 
 def parse_status(homework):
     """Извлекает из информации о домашней работе
-    статус этой работы.
-    """
+    статус этой работы."""
     required_keys = {'status', 'homework_name'}
     if not required_keys.issubset(homework.keys()):
         raise KeyError(
             f'Словарь homework должен содержать ключи: {required_keys}')
-
     homework_status = homework.get('status')
     if homework_status not in HOMEWORK_VERDICTS:
         raise ValueError(
