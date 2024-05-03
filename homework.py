@@ -40,9 +40,7 @@ HOMEWORK_VERDICTS = {
 
 
 def check_tokens():
-    """Проверяет доступность переменных окружения,
-    необходимых для работы бота.
-    """
+    """Проверяет доступность переменных окружения,необходимых для работы бота."""
     if not all([PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID]):
         logger.critical('Проблема с переменными окружения')
         exit()
@@ -103,9 +101,7 @@ def check_response(response):
 
 
 def parse_status(homework):
-    """Извлекает из информации о домашней работе
-    статус этой работы.
-    """
+    """Извлекает из информации о домашней работе статус этой работы."""
     required_keys = {'status', 'homework_name'}
     if not required_keys.issubset(homework.keys()):
         raise KeyError(
