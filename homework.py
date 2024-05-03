@@ -41,7 +41,8 @@ HOMEWORK_VERDICTS = {
 
 def check_tokens():
     """Проверяет доступность переменных окружения,
-    необходимых для работы бота."""
+    необходимых для работы бота.
+    """
     if not all([PRACTICUM_TOKEN, TELEGRAM_TOKEN, TELEGRAM_CHAT_ID]):
         logger.critical('Проблема с переменными окружения')
         exit()
@@ -78,7 +79,8 @@ def get_api_answer(timestamp):
 
 def check_response(response):
     """Проверяет ответ API на соответствие документации из
-    урока «API сервиса Практикум Домашка»."""
+    урока «API сервиса Практикум Домашка».
+    """
     if not isinstance(response, dict):
         raise TypeError('Ответ API должен быть словарем')
 
@@ -102,7 +104,8 @@ def check_response(response):
 
 def parse_status(homework):
     """Извлекает из информации о домашней работе
-    статус этой работы."""
+    статус этой работы.
+    """
     required_keys = {'status', 'homework_name'}
     if not required_keys.issubset(homework.keys()):
         raise KeyError(
