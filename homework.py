@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import time
@@ -5,8 +6,11 @@ from datetime import datetime, timedelta
 from http import HTTPStatus
 
 import requests
+import telegram
 from dotenv import load_dotenv
 from telebot import TeleBot
+
+from except_help import CustomAPIResponseError, JSONDecodeError
 
 load_dotenv()
 
@@ -52,27 +56,24 @@ def send_message(bot, message):
     try:
         bot.send_message(TELEGRAM_CHAT_ID, message)
         logger.debug(f'Сообщение отправлено: {message}')
-    except Exception as error:
-        logger.error(f'Сбой при отправке сообщения: {error}')
+    except telegram.TelegramError as telegram_error:
+        logger.error(f'Сбой при отправке сообщения: {telegram_error}')
 
 
 def get_api_answer(timestamp):
     """Делает запрос к единственному эндпоинту API-сервиса."""
     params = {'from_date': timestamp}
-    logger.info(f'Отправлен запрос API {ENDPOINT}')
     try:
         response = requests.get(ENDPOINT, headers=HEADERS, params=params)
-    except Exception as error:
-        logger.critical(f'Ошибка при запросе к основному API: {error}')
-
+    except requests.RequestException as error:
+        raise ConnectionError(f'Ошибка {error}')
     if response.status_code != HTTPStatus.OK:
-        logger.critical(
+        raise CustomAPIResponseError(
             f'Неуспешный статус ответа API: {response.status_code}')
-        raise ValueError(
-            f'Неуспешный статус ответа API: {response.status_code}')
-
-    logger.info(f'Запрос API к {ENDPOINT} прошел успешно')
-    return response.json()
+    try:
+        return response.json()
+    except json.JSONDecodeError as error:
+        raise JSONDecodeError(f'Ошибка при декодировании JSON: {error}')
 
 
 def check_response(response):
@@ -81,22 +82,16 @@ def check_response(response):
     """
     if not isinstance(response, dict):
         raise TypeError('Ответ API должен быть словарем')
-
     if 'homeworks' not in response or 'current_date' not in response:
         raise ValueError('В ответе API отсутствуют обязательные ключи')
-
     homeworks = response.get('homeworks')
     if not isinstance(homeworks, list):
         raise TypeError('homeworks должны быть списком')
-
     if not homeworks:
         raise ValueError('Список homeworks пуст')
-
     current_date = response.get('current_date')
     if not isinstance(current_date, int):
         raise TypeError('current_date должен быть целым числом')
-
-    logger.info('Ресурс API соответствует документации Python.')
     return homeworks, current_date
 
 
@@ -110,7 +105,6 @@ def parse_status(homework):
     if homework_status not in HOMEWORK_VERDICTS:
         raise ValueError(
             f'Такого статуса домашней работы нет: {homework.get("status")}')
-
     homework_name = homework.get('homework_name')
     verdict = HOMEWORK_VERDICTS.get(homework.get('status'))
     return f'Изменился статус проверки работы "{homework_name}". {verdict}'
@@ -121,13 +115,15 @@ def main():
     check_tokens()
     bot = TeleBot(token=TELEGRAM_TOKEN)
     current_date = datetime.now()
-    one_month_ago = current_date - timedelta(days=15)
+    one_month_ago = current_date - timedelta(days=1)
     timestamp = int(one_month_ago.timestamp())
 
     while True:
         try:
             response = get_api_answer(timestamp)
             homeworks, current_date = check_response(response)
+            # Обновление timestamp для следующего запроса
+            timestamp = current_date
             # Если новых статусов нет, отправляем сообщение об этом
             if not homeworks:
                 message = 'Нет новых статусов домашних работ.'
