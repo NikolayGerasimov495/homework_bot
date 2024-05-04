@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from http import HTTPStatus
 
 import requests
-import telegram
+#import telegram
 from dotenv import load_dotenv
 from telebot import TeleBot
 
