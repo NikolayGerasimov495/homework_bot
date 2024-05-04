@@ -55,9 +55,11 @@ def send_message(bot, message):
     try:
         bot.send_message(TELEGRAM_CHAT_ID, message)
         logger.debug(f'Сообщение отправлено: {message}')
-    except Exception as telegram_error:
+    except Exception as telegram_error: #telegram.TelegramError выдает ошибку и тесты на
+        # сервере не проходят импортировал все
         logger.error(f'Сбой при отправке сообщения: {telegram_error}')
-#telegram.TelegramError выдает ошибку и тесты на сервере не проходят импортировал все
+
+
 
 def get_api_answer(timestamp):
     """Делает запрос к единственному эндпоинту API-сервиса."""
