@@ -7,7 +7,7 @@ from http import HTTPStatus
 
 import requests
 from dotenv import load_dotenv
-from telebot import TeleBot
+from telebot import TeleBot, types
 
 from except_help import CustomAPIResponseError, JSONDecodeError
 
@@ -55,8 +55,10 @@ def send_message(bot, message):
     try:
         bot.send_message(TELEGRAM_CHAT_ID, message)
         logger.debug(f'Сообщение отправлено: {message}')
-    except Exception as telegram_error:
+    except types.TelegramError as telegram_error:
         logger.error(f'Сбой при отправке сообщения: {telegram_error}')
+    except Exception as other_error:
+        logger.error(f'Другая ошибка при отправке сообщения: {other_error}')
 
 
 def get_api_answer(timestamp):
