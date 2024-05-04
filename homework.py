@@ -9,7 +9,7 @@ import requests
 from dotenv import load_dotenv
 from telebot import TeleBot, types
 
-from except_help import CustomAPIResponseError, JSONDecodeError
+from exceptions import CustomAPIResponseError, JSONDecodeError
 
 load_dotenv()
 
